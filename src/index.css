@@ -105,3 +105,18 @@ button { background: #e50914; color: white; border: none; cursor: pointer; }
   font-family: inherit;
 }
 .autor { margin: 12px 0 0; color: #999; font-size: 13px; }
+
+.resenas input[type='number'] {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #121212;
+  color: inherit;
+  font-size: 16px;
+}
+.botones { display: flex; gap: 8px; }
+.resena-vista .nota { font-size: 44px; font-weight: bold; line-height: 1; }
+.resena-vista .nota span { font-size: 18px; color: #999; font-weight: normal; }
+.resena-vista .etiqueta { font-weight: bold; margin: 6px 0 12px; }
+.resena-vista .comentario { white-space: pre-wrap; } /* respeta los saltos de línea que escribas */
+.resena-vista > .secundario { margin-top: 12px; }

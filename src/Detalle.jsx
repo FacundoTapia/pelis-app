@@ -47,7 +47,13 @@ export default function Detalle({ item, onCerrar, yaEnLista, onAgregar, itemList
         {error && <p className="error">No se pudo cargar la información</p>}
         {datos && <p>{datos.sinopsis || 'Sin sinopsis disponible.'}</p>}
         {/* la reseña solo existe si la peli ya está en la lista */}
-        {itemLista && <Resenas key={itemLista.id} item={itemLista} userName={userName} />}
+        {/* la reseña solo se puede escribir cuando la peli ya está marcada como vista */}
+        {itemLista && itemLista.watched && (
+        <Resenas key={itemLista.id} item={itemLista} userName={userName} />
+        )}
+        {itemLista && !itemLista.watched && (
+        <p className="meta">Cuando la marquen como vista van a poder dejar su reseña acá.</p>
+        )}
       </div>
     </div>
   )

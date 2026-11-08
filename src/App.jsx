@@ -27,8 +27,12 @@ function App() {
   if (cargando) return <p>Cargando...</p>
   if (!session) return <Login /> // sin sesión → pantalla de login
 
-  return <Home userName={session.user.email.split('@')[0]} />
-// split('@') corta el email en dos: ["facu", "gmail.com"]; con [0] nos quedamos con la primera parte
+  // user_metadata es donde guardamos { nombre: "Facu" } con el SQL
+  // el ?. (optional chaining) evita un error si user_metadata no existe
+  // si no hay nombre cargado, usamos la parte del email como respaldo
+  const nombre = session.user.user_metadata?.nombre || session.user.email.split('@')[0]
+
+  return <Home userName={nombre} />
 }
 
 export default App
