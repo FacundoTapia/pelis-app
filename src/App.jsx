@@ -1,4 +1,4 @@
-import Buscador from './Buscador'
+import Home from './Home'
 import { useState, useEffect } from 'react'
 import { supabase } from './supabase'
 import Login from './Login'
@@ -27,15 +27,7 @@ function App() {
   if (cargando) return <p>Cargando...</p>
   if (!session) return <Login /> // sin sesión → pantalla de login
 
-  return (
-    <div className="app">
-      <header>
-        <h1>🎬 Pelis</h1>
-        <button onClick={() => supabase.auth.signOut()}>Salir</button>
-      </header>
-      <Buscador />
-    </div>
-  )
+  return <Home />
 }
 
 export default App

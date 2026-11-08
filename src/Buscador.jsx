@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { buscar, IMG } from './tmdb'
 
-export default function Buscador() {
+export default function Buscador({onAgregar, yaAgregados}) {
   const [texto, setTexto] = useState('')
   const [resultados, setResultados] = useState([])
   const [buscando, setBuscando] = useState(false)
@@ -35,19 +35,24 @@ export default function Buscador() {
       <ul className="resultados">
         {resultados.map((r) => (
           // key ayuda a React a distinguir cada elemento de la lista
-          <li key={`${r.media_type}-${r.tmdb_id}`}>
-            {r.poster_path ? (
-              <img src={IMG + r.poster_path} alt={r.title} />
-            ) : (
-              <div className="sin-poster">Sin póster</div>
-            )}
-            <div>
-              <strong>{r.title}</strong>
-              <small>
-                {r.media_type === 'movie' ? 'Película' : 'Serie'} {r.year && `· ${r.year}`}
-              </small>
-            </div>
-          </li>
+            <li key={`${r.media_type}-${r.tmdb_id}`}>
+                {r.poster_path ? (
+                <img src={IMG + r.poster_path} alt={r.title} />
+                ) : (
+                <div className="sin-poster">Sin póster</div>
+                )}
+                <div>
+                <strong>{r.title}</strong>
+                <small>
+                    {r.media_type === 'movie' ? 'Película' : 'Serie'} {r.year && `· ${r.year}`}
+                </small>
+                </div>
+                {yaAgregados.includes(`${r.media_type}-${r.tmdb_id}`) ? (
+                    <span className="en-lista">✓ En la lista</span> // si ya está agregada, solo avisa
+                    ) : (
+                    <button className="agregar" onClick={() => onAgregar(r)}>+ Agregar</button>
+                    )}
+            </li>
         ))}
       </ul>
     </div>
