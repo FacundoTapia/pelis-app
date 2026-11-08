@@ -1,3 +1,4 @@
+import Buscador from './Buscador'
 import { useState, useEffect } from 'react'
 import { supabase } from './supabase'
 import Login from './Login'
@@ -32,7 +33,7 @@ function App() {
         <h1>🎬 Pelis</h1>
         <button onClick={() => supabase.auth.signOut()}>Salir</button>
       </header>
-      <p>Hola, {session.user.email}</p>
+      <Buscador />
     </div>
   )
 }
