@@ -4,7 +4,7 @@ import Buscador from './Buscador'
 import Lista from './Lista'
 import Detalle from './Detalle'
 
-export default function Home() {
+export default function Home({ userName }) {
   const [items, setItems] = useState([]) // la lista compartida
   const [mensaje, setMensaje] = useState('') // avisos al usuario ("Ya está en la lista", errores)
   const [abierto, setAbierto] = useState(null) // el item que se está mirando en detalle (null = ninguno)
@@ -89,6 +89,11 @@ useEffect(() => {
 
   // Lista de claves ("movie-123") de lo que ya está agregado, para marcarlo en el buscador
   const yaAgregados = items.map((i) => `${i.media_type}-${i.tmdb_id}`)
+  // find devuelve el primer item que cumple la condición (o undefined si no hay ninguno)
+// buscamos la fila de Supabase de la película abierta, porque ahí está guardada la reseña
+    const itemLista = abierto
+    ? items.find((i) => i.media_type === abierto.media_type && i.tmdb_id === abierto.tmdb_id)
+    : null
 
   return (
     <div className="app">
@@ -114,6 +119,8 @@ useEffect(() => {
                 onCerrar={() => setAbierto(null)}
                 yaEnLista={yaAgregados.includes(`${abierto.media_type}-${abierto.tmdb_id}`)}
                 onAgregar={agregar}
+                itemLista={itemLista}
+                userName={userName}
             />
         )}
     </div>

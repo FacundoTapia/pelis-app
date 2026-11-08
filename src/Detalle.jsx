@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { detalle, IMG } from './tmdb'
+import Resenas from './Resenas'
 
-export default function Detalle({ item, onCerrar, yaEnLista, onAgregar }) {
+export default function Detalle({ item, onCerrar, yaEnLista, onAgregar, itemLista, userName }) {
   const [datos, setDatos] = useState(null) // null = todavía cargando
   const [error, setError] = useState(false)
 
@@ -45,6 +46,8 @@ export default function Detalle({ item, onCerrar, yaEnLista, onAgregar }) {
         {!datos && !error && <p>Cargando...</p>}
         {error && <p className="error">No se pudo cargar la información</p>}
         {datos && <p>{datos.sinopsis || 'Sin sinopsis disponible.'}</p>}
+        {/* la reseña solo existe si la peli ya está en la lista */}
+        {itemLista && <Resenas key={itemLista.id} item={itemLista} userName={userName} />}
       </div>
     </div>
   )

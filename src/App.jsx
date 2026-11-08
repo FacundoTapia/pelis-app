@@ -27,7 +27,8 @@ function App() {
   if (cargando) return <p>Cargando...</p>
   if (!session) return <Login /> // sin sesión → pantalla de login
 
-  return <Home />
+  return <Home userName={session.user.email.split('@')[0]} />
+// split('@') corta el email en dos: ["facu", "gmail.com"]; con [0] nos quedamos con la primera parte
 }
 
 export default App
