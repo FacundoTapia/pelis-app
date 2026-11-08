@@ -1,13 +1,7 @@
 import { useState } from 'react'
 import { supabase } from './supabase'
-
-// Según la nota devuelve el color y el texto del rango
-function clasificar(nota) {
-  if (nota < 4) return { color: '#e5484d', etiqueta: 'Desaprobado' }
-  if (nota < 6) return { color: '#f5a524', etiqueta: 'Apenas aprobado' }
-  if (nota < 8) return { color: '#3b82f6', etiqueta: 'Buena peli' }
-  return { color: '#30a46c', etiqueta: 'Peliculón' }
-}
+import FormResena from './FormResena'
+import { clasificar } from './nota'
 
 export default function Resenas({ item, userName }) {
   // copia local de la película: al guardar la actualizamos con lo que devuelve Supabase
@@ -18,26 +12,8 @@ export default function Resenas({ item, userName }) {
 
   // si todavía no hay reseña arrancamos con el formulario abierto; si hay, mostramos la reseña
   const [editando, setEditando] = useState(!tieneResena)
-  const [rating, setRating] = useState(item.rating ?? '') // ?? '' = si es null, texto vacío
-  const [comentario, setComentario] = useState(item.review ?? '')
-  const [mensaje, setMensaje] = useState('')
 
-  async function guardar(e) {
-    e.preventDefault() // evita que recargue la página
-    setMensaje('')
-
-    const nota = rating === '' ? null : Number(rating) // el input da texto; lo pasamos a número
-    const texto = comentario.trim() || null
-
-    if (nota !== null && (Number.isNaN(nota) || nota < 0 || nota > 10)) {
-      setMensaje('La nota tiene que estar entre 0 y 10')
-      return // return corta la función: no se guarda nada
-    }
-    if (nota === null && !texto) {
-      setMensaje('Poné una nota o un comentario')
-      return
-    }
-
+  async function guardar({ nota, texto }) {
     const { data, error } = await supabase
       .from('items')
       .update({
@@ -50,20 +26,10 @@ export default function Resenas({ item, userName }) {
       .select() // pedimos que nos devuelva la fila actualizada
       .single() // ...una sola, no una lista
 
-    if (error) {
-      setMensaje('No se pudo guardar')
-    } else {
-      setDatos(data)
-      setEditando(false) // cerramos el formulario para que se vea la reseña
-    }
-  }
-
-  // cancelar la edición: volvemos a los valores guardados y cerramos el formulario
-  function cancelar() {
-    setRating(datos.rating ?? '')
-    setComentario(datos.review ?? '')
-    setMensaje('')
-    setEditando(false)
+    if (error) return 'No se pudo guardar' // FormResena muestra este texto
+    setDatos(data)
+    setEditando(false) // cerramos el formulario para que se vea la reseña
+    return null // null = salió todo bien
   }
 
   // ---------- Modo edición: formulario ----------
@@ -71,39 +37,20 @@ export default function Resenas({ item, userName }) {
     return (
       <div className="resenas">
         <h3>Nuestra reseña</h3>
-        <form onSubmit={guardar}>
-          <input
-            type="number"
-            min="0"
-            max="10"
-            step="0.01" // permite decimales (7.5, 8.25)
-            placeholder="Nota de 0 a 10"
-            value={rating}
-            onChange={(e) => setRating(e.target.value)}
-          />
-          <textarea
-            placeholder="Notas o comentario..."
-            value={comentario}
-            onChange={(e) => setComentario(e.target.value)}
-            rows={3}
-          />
-          <div className="botones">
-            <button type="submit">Guardar reseña</button>
-            {/* solo se puede cancelar si ya había una reseña guardada */}
-            {tieneResena && (
-              <button type="button" className="secundario" onClick={cancelar}>
-                Cancelar
-              </button>
-            )}
-          </div>
-          {mensaje && <small className="error">{mensaje}</small>}
-        </form>
+        <FormResena
+          notaInicial={datos.rating}
+          comentarioInicial={datos.review}
+          textoGuardar="Guardar reseña"
+          onGuardar={guardar}
+          // solo se puede cancelar si ya había una reseña guardada
+          textoSecundario={tieneResena ? 'Cancelar' : undefined}
+          onSecundario={() => setEditando(false)}
+        />
       </div>
     )
   }
 
   // ---------- Modo lectura: la reseña ya guardada ----------
-  // clasificar solo se llama si hay nota; si no hay, no mostramos color ni etiqueta
   const clase = datos.rating != null ? clasificar(datos.rating) : null
 
   return (
@@ -125,7 +72,6 @@ export default function Resenas({ item, userName }) {
 
       <p className="autor">
         Escrito por {datos.reviewed_by_name} ·{' '}
-        {/* toLocaleString con 'es-AR' muestra la fecha en formato argentino */}
         {new Date(datos.reviewed_at).toLocaleString('es-AR', {
           dateStyle: 'medium',
           timeStyle: 'short',

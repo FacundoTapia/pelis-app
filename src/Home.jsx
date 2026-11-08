@@ -3,11 +3,13 @@ import { supabase } from './supabase'
 import Buscador from './Buscador'
 import Lista from './Lista'
 import Detalle from './Detalle'
+import MarcarVista from './MarcarVista'
 
 export default function Home({ userName }) {
   const [items, setItems] = useState([]) // la lista compartida
   const [mensaje, setMensaje] = useState('') // avisos al usuario ("Ya está en la lista", errores)
   const [abierto, setAbierto] = useState(null) // el item que se está mirando en detalle (null = ninguno)
+  const [porMarcar, setPorMarcar] = useState(null) // la película que se está por marcar como vista
 
   // Trae todos los items de Supabase, los más nuevos primero
   async function cargarItems() {
@@ -69,16 +71,20 @@ useEffect(() => {
   }
 
   async function toggleVisto(item) {
+    // si todavía no la vieron, abrimos el cartel para dejar la reseña en el momento
+    if (!item.watched) {
+        setPorMarcar(item)
+        return // salimos: el guardado lo hace el cartel
+    }
+
+    // si ya estaba vista y la pasan a pendiente, se hace directo
     const { error } = await supabase
-      .from('items')
-      .update({
-        watched: !item.watched, // si estaba en false pasa a true, y al revés
-        watched_at: !item.watched ? new Date().toISOString() : null, // guardamos cuándo la vimos
-      })
-      .eq('id', item.id) // IMPORTANTE: sin esto actualizaría TODAS las filas
+        .from('items')
+        .update({ watched: false, watched_at: null })
+        .eq('id', item.id)
     if (error) setMensaje('No se pudo actualizar')
     else cargarItems()
-  }
+    }
 
   async function borrar(item) {
     if (!window.confirm(`¿Borrar "${item.title}" de la lista?`)) return // pide confirmación
@@ -123,6 +129,19 @@ useEffect(() => {
                 userName={userName}
             />
         )}
+
+        {porMarcar && (
+            <MarcarVista
+                item={porMarcar}
+                userName={userName}
+                onCerrar={() => setPorMarcar(null)}
+                onListo={() => {
+                setPorMarcar(null) // cerramos el cartel
+                cargarItems() // y refrescamos la lista
+                }}
+            />
+        )}
+
     </div>
   )
 }

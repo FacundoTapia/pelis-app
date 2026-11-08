@@ -31,7 +31,7 @@ function App() {
   // el ?. (optional chaining) evita un error si user_metadata no existe
   // si no hay nombre cargado, usamos la parte del email como respaldo
   const nombre = session.user.user_metadata?.nombre || session.user.email.split('@')[0]
-
+  console.log(session.user.user_metadata) // tiene que mostrar { nombre: 'Facu', ... }
   return <Home userName={nombre} />
 }
 

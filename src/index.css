@@ -120,3 +120,16 @@ button { background: #e50914; color: white; border: none; cursor: pointer; }
 .resena-vista .etiqueta { font-weight: bold; margin: 6px 0 12px; }
 .resena-vista .comentario { white-space: pre-wrap; } /* respeta los saltos de línea que escribas */
 .resena-vista > .secundario { margin-top: 12px; }
+
+.resena-lista { display: flex; flex-direction: column; gap: 2px; }
+.nota-chip { font-weight: bold; }
+.comentario-lista {
+  margin: 2px 0;
+  font-size: 14px;
+  color: #ccc;
+  /* recorta el texto a 2 líneas y agrega "..." */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

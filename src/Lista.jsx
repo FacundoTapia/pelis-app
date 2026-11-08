@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { IMG } from './tmdb'
+import { clasificar } from './nota'
 
 export default function Lista({ items, onToggleVisto, onBorrar, onAbrir }) {
   const [pestana, setPestana] = useState('pendientes') // 'pendientes' o 'vistas'
@@ -42,6 +43,18 @@ export default function Lista({ items, onToggleVisto, onBorrar, onAbrir }) {
             <div className="info">
               <strong className="clickeable" onClick={() => onAbrir(item)}>{item.title}</strong>
               <small>{item.media_type === 'movie' ? 'Película' : 'Serie'}</small>
+              {/* si la peli está vista y tiene reseña, la mostramos directo en la lista */}
+              {item.watched && (item.rating != null || item.review) && (
+                <div className="resena-lista">
+                  {item.rating != null && (
+                    <span className="nota-chip" style={{ color: clasificar(item.rating).color }}>
+                      {item.rating} · {clasificar(item.rating).etiqueta}
+                    </span>
+                  )}
+                  {item.review && <p className="comentario-lista">{item.review}</p>}
+                  <small>Por {item.reviewed_by_name}</small>
+                </div>
+              )}
               <div className="acciones">
                 <button onClick={() => onToggleVisto(item)}>
                   {item.watched ? 'Volver a pendiente' : '✓ Ya la vimos'}
