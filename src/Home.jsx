@@ -19,18 +19,35 @@ export default function Home() {
 
   // [] al final = se ejecuta una sola vez, al abrir la pantalla
 useEffect(() => {
-  supabase
-    .from('items')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .then(({ data, error }) => {
-      // .then = "cuando llegue la respuesta de Supabase, ejecutá esto"
-      // acá setState se llama dentro de un callback (cuando llegan los datos),
-      // que es justo lo que React considera correcto
-      if (error) setMensaje('No se pudo cargar la lista')
-      else setItems(data)
-    })
-}, []) // [] = se ejecuta una sola vez, al abrir la pantalla
+  // trae la lista y la guarda en el estado (la definimos adentro del efecto)
+  function traer() {
+    supabase
+      .from('items')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (error) setMensaje('No se pudo cargar la lista')
+        else setItems(data)
+      })
+  }
+
+  traer() // carga inicial, al abrir la pantalla
+
+  // nos suscribimos a los cambios de la tabla "items"
+  const canal = supabase
+    .channel('items-cambios') // nombre del canal, puede ser cualquiera
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'items' }, // '*' = cualquier cambio: agregar, editar o borrar
+      traer // cuando algo cambia, volvemos a pedir la lista
+    )
+    .subscribe()
+
+  // al salir de la pantalla, cerramos el canal (limpieza)
+  return () => {
+    supabase.removeChannel(canal)
+  }
+}, [])
 
   async function agregar(r) {
     setMensaje('')
