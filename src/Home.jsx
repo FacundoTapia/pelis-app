@@ -10,6 +10,7 @@ export default function Home({ userName }) {
   const [mensaje, setMensaje] = useState('') // avisos al usuario ("Ya está en la lista", errores)
   const [abierto, setAbierto] = useState(null) // el item que se está mirando en detalle (null = ninguno)
   const [porMarcar, setPorMarcar] = useState(null) // la película que se está por marcar como vista
+  const [busquedaKey, setBusquedaKey] = useState(0) // cada vez que cambia, el buscador se reinicia
 
   // Trae todos los items de Supabase, los más nuevos primero
   async function cargarItems() {
@@ -67,6 +68,7 @@ useEffect(() => {
       setMensaje(error.code === '23505' ? 'Ya está en la lista' : 'No se pudo agregar')
     } else {
       cargarItems() // recargamos para ver el nuevo item
+      setBusquedaKey((k) => k + 1) // k + 1 cambia la key → React reinicia el buscador (texto y resultados vacíos)
     }
   }
 
@@ -110,7 +112,12 @@ useEffect(() => {
 
       {mensaje && <p className="error">{mensaje}</p>}
 
-      <Buscador onAgregar={agregar} onAbrir={setAbierto} yaAgregados={yaAgregados} />
+      <Buscador
+        key={busquedaKey}
+        onAgregar={agregar}
+        onAbrir={setAbierto}
+        yaAgregados={yaAgregados}
+      />
       <Lista
         items={items}
         onToggleVisto={toggleVisto}
