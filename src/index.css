@@ -59,3 +59,35 @@ button { background: #e50914; color: white; border: none; cursor: pointer; }
 .agregar { padding: 8px 10px; font-size: 14px; white-space: nowrap; }
 .en-lista { color: #6fcf97; font-size: 14px; white-space: nowrap; }
 .vacio { color: #999; text-align: center; margin-top: 24px; }
+.clickeable { cursor: pointer; }
+
+.fondo {
+  position: fixed;
+  inset: 0; /* ocupa toda la pantalla */
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 10;
+}
+
+.modal {
+  position: relative;
+  background: #1e1e1e;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 480px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto; /* si la sinopsis es larga, se puede scrollear */
+}
+
+.cerrar { position: absolute; top: 8px; right: 8px; padding: 6px 10px; background: #2a2a2a; }
+.modal-cabecera { display: flex; gap: 16px; margin-bottom: 16px; }
+.modal-cabecera img { width: 110px; border-radius: 8px; align-self: flex-start; }
+.modal h2 { margin: 0 0 8px; font-size: 20px; padding-right: 32px; }
+.meta { margin: 4px 0; color: #aaa; font-size: 14px; }
+.puntaje { margin: 8px 0 0; font-weight: bold; }
+
+.agregar-detalle { width: 100%; margin-bottom: 12px; }

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { buscar, IMG } from './tmdb'
 
-export default function Buscador({onAgregar, yaAgregados}) {
+export default function Buscador({onAgregar, yaAgregados, onAbrir }) {
   const [texto, setTexto] = useState('')
   const [resultados, setResultados] = useState([])
   const [buscando, setBuscando] = useState(false)
@@ -37,12 +37,17 @@ export default function Buscador({onAgregar, yaAgregados}) {
           // key ayuda a React a distinguir cada elemento de la lista
             <li key={`${r.media_type}-${r.tmdb_id}`}>
                 {r.poster_path ? (
-                <img src={IMG + r.poster_path} alt={r.title} />
+                <img
+                    className="clickeable"
+                    src={IMG + r.poster_path}
+                    alt={r.title}
+                    onClick={() => onAbrir(r)} // abre el detalle con el resultado de la búsqueda
+                />
                 ) : (
-                <div className="sin-poster">Sin póster</div>
+                <div className="sin-poster clickeable" onClick={() => onAbrir(r)}>Sin póster</div>
                 )}
                 <div>
-                <strong>{r.title}</strong>
+                <strong className="clickeable" onClick={() => onAbrir(r)}>{r.title}</strong>
                 <small>
                     {r.media_type === 'movie' ? 'Película' : 'Serie'} {r.year && `· ${r.year}`}
                 </small>

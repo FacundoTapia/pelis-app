@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react'
 import { supabase } from './supabase'
 import Buscador from './Buscador'
 import Lista from './Lista'
+import Detalle from './Detalle'
 
 export default function Home() {
   const [items, setItems] = useState([]) // la lista compartida
   const [mensaje, setMensaje] = useState('') // avisos al usuario ("Ya está en la lista", errores)
+  const [abierto, setAbierto] = useState(null) // el item que se está mirando en detalle (null = ninguno)
 
   // Trae todos los items de Supabase, los más nuevos primero
   async function cargarItems() {
@@ -44,7 +46,7 @@ useEffect(() => {
     .subscribe()
 
   // al salir de la pantalla, cerramos el canal (limpieza)
-  return () => {
+  return () => { 
     supabase.removeChannel(canal)
   }
 }, [])
@@ -97,8 +99,23 @@ useEffect(() => {
 
       {mensaje && <p className="error">{mensaje}</p>}
 
-      <Buscador onAgregar={agregar} yaAgregados={yaAgregados} />
-      <Lista items={items} onToggleVisto={toggleVisto} onBorrar={borrar} />
+      <Buscador onAgregar={agregar} onAbrir={setAbierto} yaAgregados={yaAgregados} />
+      <Lista
+        items={items}
+        onToggleVisto={toggleVisto}
+        onBorrar={borrar}
+        onAbrir={setAbierto}
+      />
+
+        {abierto && (
+            <Detalle
+                key={`${abierto.media_type}-${abierto.tmdb_id}`}
+                item={abierto}
+                onCerrar={() => setAbierto(null)}
+                yaEnLista={yaAgregados.includes(`${abierto.media_type}-${abierto.tmdb_id}`)}
+                onAgregar={agregar}
+            />
+        )}
     </div>
   )
 }

@@ -21,3 +21,34 @@ export async function buscar(texto) {
       year: (r.release_date || r.first_air_date || '').slice(0, 4), // "2019-05-01" → "2019"
     }))
 }
+
+// Trae el detalle completo de una peli o serie
+// tipo es 'movie' o 'tv', justo lo que guardamos en media_type, y coincide con la URL de TMDB
+export async function detalle(id, tipo) {
+  // función auxiliar: hace el pedido en el idioma que le pasemos
+  async function pedir(idioma) {
+    const res = await fetch(`${BASE}/${tipo}/${id}?api_key=${KEY}&language=${idioma}`)
+    return res.json()
+  }
+
+  const d = await pedir('es-AR')
+
+  // respaldo: si no hay sinopsis en es-AR, probamos con español de México
+  if (!d.overview) {
+    const alternativo = await pedir('es-MX')
+    d.overview = alternativo.overview
+  }
+
+  return {
+    title: d.title || d.name,
+    year: (d.release_date || d.first_air_date || '').slice(0, 4),
+    generos: (d.genres || []).map((g) => g.name), // [{id, name}, ...] → ['Drama', 'Ciencia ficción']
+    puntaje: d.vote_average, // puntaje de TMDB, de 0 a 10
+    sinopsis: d.overview,
+    // las pelis tienen runtime (minutos); las series, cantidad de temporadas
+    duracion:
+      tipo === 'movie'
+        ? d.runtime ? `${d.runtime} min` : ''
+        : d.number_of_seasons ? `${d.number_of_seasons} temporada(s)` : '',
+  }
+}
